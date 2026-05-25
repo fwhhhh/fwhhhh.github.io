@@ -55,7 +55,56 @@
     <div class="projects-grid" id="projectsGrid">
       <!-- 由 JS 动态渲染 -->
     </div>
+    <div class="add-project-wrapper animate-on-scroll">
+      <button class="add-project-btn" id="addProjectBtn">+ 添加项目</button>
+    </div>
   </section>
+
+  <!-- 项目编辑弹窗 -->
+  <div class="modal-overlay hidden" id="projectModal">
+    <div class="modal-card">
+      <h3 id="modalTitle">添加项目</h3>
+      <div class="modal-field">
+        <label>项目名称</label>
+        <input type="text" id="projName" placeholder="给项目起个名字">
+      </div>
+      <div class="modal-field">
+        <label>项目描述</label>
+        <textarea id="projDesc" rows="3" placeholder="简单介绍一下这个项目"></textarea>
+      </div>
+      <div class="modal-field">
+        <label>技术标签 <small>(用逗号分隔)</small></label>
+        <input type="text" id="projTags" placeholder="React, Node.js, ...">
+      </div>
+      <div class="modal-field">
+        <label>项目链接 <small>(选填)</small></label>
+        <input type="text" id="projLink" placeholder="https://github.com/xxx">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="modalCancel">取消</button>
+        <button class="modal-btn confirm" id="modalConfirm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 密码验证弹窗 -->
+  <div class="modal-overlay hidden" id="authModal">
+    <div class="modal-card modal-auth">
+      <h3>需要密码</h3>
+      <p class="auth-hint">修改内容需要验证密码</p>
+      <div class="modal-field">
+        <input type="password" id="authPassword" placeholder="请输入管理密码" autocomplete="off">
+      </div>
+      <p class="auth-error hidden" id="authError">密码错误，请重试</p>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="authCancel">取消</button>
+        <button class="modal-btn confirm" id="authConfirm">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 角落管理锁 -->
+  <button class="auth-lock" id="authLock" title="管理登录">🔒</button>
 
   <!-- 社交媒体区 -->
   <section class="social" id="contact">

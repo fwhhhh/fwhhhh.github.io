@@ -2,11 +2,11 @@
 const userInfo = {
   nickname: "fwhhhh",
   tagline: "懒惰成性的人在往下坠...",
-  avatar: "", // 填头像图片URL，留空则用默认占位图
+  avatar: "avatar.jpg", // 填头像图片URL，留空则用默认占位图
 };
 
-/* ===== 项目数据 ===== */
-const projects = [
+/* ===== 项目数据（默认值） ===== */
+const defaultProjects = [
   {
     name: "示例项目",
     description: "这是一个示例项目，点击这里修改为你的第一个项目吧。",
@@ -26,6 +26,20 @@ const projects = [
     link: "https://github.com",
   },
 ];
+
+function loadProjects() {
+  try {
+    const saved = localStorage.getItem("homepage_projects");
+    if (saved) return JSON.parse(saved);
+  } catch (_) { /* ignore */ }
+  return defaultProjects.map((p) => ({ ...p }));
+}
+
+function saveProjects(list) {
+  localStorage.setItem("homepage_projects", JSON.stringify(list));
+}
+
+let projects = loadProjects();
 
 /* ===== 社交媒体链接 ===== */
 const socialLinks = [
@@ -81,8 +95,12 @@ function renderProjects() {
 
   grid.innerHTML = projects
     .map(
-      (p) => `
-    <div class="project-card animate-on-scroll" data-link="${p.link || ""}">
+      (p, i) => `
+    <div class="project-card animate-on-scroll" data-link="${escapeHtml(p.link || "")}">
+      <div class="project-actions">
+        <button class="btn-edit" data-index="${i}" title="编辑">✎</button>
+        <button class="btn-delete" data-index="${i}" title="删除">✕</button>
+      </div>
       <h3>${escapeHtml(p.name)}</h3>
       <p>${escapeHtml(p.description)}</p>
       <div class="project-tags">
@@ -93,13 +111,178 @@ function renderProjects() {
     )
     .join("");
 
-  // 点击卡片跳转
+  // 点击卡片跳转（排除操作按钮区域）
   grid.querySelectorAll(".project-card").forEach((card) => {
-    card.addEventListener("click", () => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".project-actions")) return;
       const link = card.dataset.link;
       if (link) window.open(link, "_blank");
     });
   });
+
+  // 编辑按钮
+  grid.querySelectorAll(".btn-edit").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      requireAuth(() => openProjectModal(parseInt(btn.dataset.index)));
+    });
+  });
+
+  // 删除按钮
+  grid.querySelectorAll(".btn-delete").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      requireAuth(() => deleteProject(parseInt(btn.dataset.index)));
+    });
+  });
+
+  // 重新触发滚动动画
+  initScrollAnimations();
+}
+
+/* ===== 项目编辑弹窗 ===== */
+let editingIndex = -1;
+
+// 待执行的编辑操作（需验证通过后才执行）
+let pendingAction = null;
+
+/* ===== 密码验证 ===== */
+// 修改下面这行来更换密码（SHA-256 哈希值）
+const PASSWORD_HASH = "ee3821c50561ccf1dd5a30d3211c97ea32a61d2c2b1a5e71c5122de557f2d089";
+
+function isAuthed() {
+  return sessionStorage.getItem("homepage_auth") === "1";
+}
+
+function setAuthed(v) {
+  if (v) {
+    sessionStorage.setItem("homepage_auth", "1");
+  } else {
+    sessionStorage.removeItem("homepage_auth");
+  }
+  updateLockIcon();
+}
+
+async function sha256(message) {
+  const buf = new TextEncoder().encode(message);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function updateLockIcon() {
+  const lock = document.getElementById("authLock");
+  if (!lock) return;
+  if (isAuthed()) {
+    lock.textContent = "🔓";
+    lock.classList.add("unlocked");
+    lock.title = "已登录 · 点击退出";
+  } else {
+    lock.textContent = "🔒";
+    lock.classList.remove("unlocked");
+    lock.title = "管理登录";
+  }
+}
+
+function requireAuth(action) {
+  if (isAuthed()) {
+    action();
+  } else {
+    pendingAction = action;
+    openAuthModal();
+  }
+}
+
+function openAuthModal() {
+  document.getElementById("authPassword").value = "";
+  document.getElementById("authError").classList.add("hidden");
+  document.getElementById("authModal").classList.remove("hidden");
+  setTimeout(() => document.getElementById("authPassword").focus(), 100);
+}
+
+function closeAuthModal() {
+  document.getElementById("authModal").classList.add("hidden");
+  pendingAction = null;
+}
+
+async function submitAuth() {
+  const input = document.getElementById("authPassword").value;
+  if (!input) return;
+  const hash = await sha256(input);
+  if (hash === PASSWORD_HASH) {
+    setAuthed(true);
+    closeAuthModal();
+    if (pendingAction) {
+      pendingAction();
+      pendingAction = null;
+    }
+  } else {
+    document.getElementById("authError").classList.remove("hidden");
+    document.getElementById("authPassword").value = "";
+    document.getElementById("authPassword").focus();
+  }
+}
+
+/* ===== 原来的弹窗函数（加鉴权包裹） ===== */
+
+function openProjectModal(index) {
+  const modal = document.getElementById("projectModal");
+  const title = document.getElementById("modalTitle");
+  if (!modal) return;
+
+  editingIndex = index;
+  if (index >= 0) {
+    title.textContent = "编辑项目";
+    const p = projects[index];
+    document.getElementById("projName").value = p.name;
+    document.getElementById("projDesc").value = p.description;
+    document.getElementById("projTags").value = p.tags.join(", ");
+    document.getElementById("projLink").value = p.link || "";
+  } else {
+    title.textContent = "添加项目";
+    document.getElementById("projName").value = "";
+    document.getElementById("projDesc").value = "";
+    document.getElementById("projTags").value = "";
+    document.getElementById("projLink").value = "";
+  }
+  modal.classList.remove("hidden");
+}
+
+function closeProjectModal() {
+  document.getElementById("projectModal").classList.add("hidden");
+}
+
+function submitProject() {
+  const name = document.getElementById("projName").value.trim();
+  const desc = document.getElementById("projDesc").value.trim();
+  const tagsStr = document.getElementById("projTags").value.trim();
+  const link = document.getElementById("projLink").value.trim();
+
+  if (!name) { alert("请填写项目名称"); return; }
+
+  const tags = tagsStr
+    ? tagsStr.split(/[,，]+/).map((t) => t.trim()).filter(Boolean)
+    : [];
+
+  const project = { name, description: desc, tags, link };
+
+  if (editingIndex >= 0) {
+    projects[editingIndex] = project;
+  } else {
+    projects.push(project);
+  }
+
+  saveProjects(projects);
+  renderProjects();
+  closeProjectModal();
+}
+
+function deleteProject(index) {
+  if (!confirm(`确定要删除「${projects[index].name}」吗？`)) return;
+  projects.splice(index, 1);
+  saveProjects(projects);
+  renderProjects();
 }
 
 /* ===== 渲染社交链接 ===== */
@@ -177,4 +360,35 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSocialLinks();
   initScrollAnimations();
   initNavScroll();
+
+  // 项目弹窗事件
+  document.getElementById("addProjectBtn")?.addEventListener("click", () => {
+    requireAuth(() => openProjectModal(-1));
+  });
+  document.getElementById("modalCancel")?.addEventListener("click", closeProjectModal);
+  document.getElementById("modalConfirm")?.addEventListener("click", submitProject);
+  document.getElementById("projectModal")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeProjectModal();
+  });
+
+  // 鉴权弹窗事件
+  document.getElementById("authCancel")?.addEventListener("click", closeAuthModal);
+  document.getElementById("authConfirm")?.addEventListener("click", submitAuth);
+  document.getElementById("authPassword")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submitAuth();
+  });
+  document.getElementById("authModal")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeAuthModal();
+  });
+
+  // 角落锁图标
+  document.getElementById("authLock")?.addEventListener("click", () => {
+    if (isAuthed()) {
+      if (confirm("确定要退出管理吗？")) setAuthed(false);
+    } else {
+      openAuthModal();
+    }
+  });
+
+  updateLockIcon();
 });
