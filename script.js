@@ -1,9 +1,26 @@
-/* ===== 个人信息配置 ===== */
-const userInfo = {
+/* ===== 个人信息配置（默认值） ===== */
+const defaultUserInfo = {
   nickname: "fwhhhh",
   tagline: "懒惰成性的人在往下坠...",
-  avatar: "avatar.jpg", // 填头像图片URL，留空则用默认占位图
+  avatar: "avatar.jpg",
+  gender: "男生",
+  girlfriend: "打烊(LMQ)",
+  girlfriendAvatar: "girlfriend.jpg",
 };
+
+function loadUserInfo() {
+  try {
+    const saved = localStorage.getItem("homepage_userinfo");
+    if (saved) return JSON.parse(saved);
+  } catch (_) { /* ignore */ }
+  return { ...defaultUserInfo };
+}
+
+function saveUserInfo(info) {
+  localStorage.setItem("homepage_userinfo", JSON.stringify(info));
+}
+
+let userInfo = loadUserInfo();
 
 /* ===== 项目数据（默认值） ===== */
 const defaultProjects = [
@@ -63,9 +80,33 @@ function applyUserInfo() {
   if (userInfo.tagline) {
     document.querySelector(".hero-tagline").textContent = userInfo.tagline;
   }
+  const gfImg = document.getElementById("gfAvatarImg");
   if (userInfo.avatar) {
     document.getElementById("avatarImg").src = userInfo.avatar;
   }
+  if (userInfo.girlfriendAvatar && gfImg) {
+    gfImg.src = userInfo.girlfriendAvatar;
+  }
+
+  // 渲染附加信息
+  const meta = document.getElementById("heroMeta");
+  if (!meta) return;
+  const items = [];
+  if (userInfo.gender) {
+    items.push(`
+      <div class="hero-meta-item">
+        <span class="meta-icon">♂</span>
+        <span class="meta-label">${escapeHtml(userInfo.gender)}</span>
+      </div>`);
+  }
+  if (userInfo.girlfriend) {
+    items.push(`
+      <div class="hero-meta-item">
+        <span class="meta-icon">💕</span>
+        <span class="meta-label">${escapeHtml(userInfo.girlfriend)}</span>
+      </div>`);
+  }
+  meta.innerHTML = items.join("");
 }
 
 /* ===== 欢迎弹窗 ===== */
@@ -285,6 +326,37 @@ function deleteProject(index) {
   renderProjects();
 }
 
+/* ===== 个人简介编辑弹窗 ===== */
+function openProfileModal() {
+  document.getElementById("profileModal").classList.remove("hidden");
+  document.getElementById("profileNickname").value = userInfo.nickname || "";
+  document.getElementById("profileTagline").value = userInfo.tagline || "";
+  document.getElementById("profileGender").value = userInfo.gender || "";
+  document.getElementById("profileGirlfriend").value = userInfo.girlfriend || "";
+  document.getElementById("profileAvatar").value = userInfo.avatar || "";
+  document.getElementById("profileGfAvatar").value = userInfo.girlfriendAvatar || "";
+}
+
+function closeProfileModal() {
+  document.getElementById("profileModal").classList.add("hidden");
+}
+
+function submitProfile() {
+  const nickname = document.getElementById("profileNickname").value.trim();
+  const tagline = document.getElementById("profileTagline").value.trim();
+  const gender = document.getElementById("profileGender").value.trim();
+  const girlfriend = document.getElementById("profileGirlfriend").value.trim();
+  const avatar = document.getElementById("profileAvatar").value.trim();
+  const girlfriendAvatar = document.getElementById("profileGfAvatar").value.trim();
+
+  if (!nickname) { alert("请填写昵称"); return; }
+
+  Object.assign(userInfo, { nickname, tagline, gender, girlfriend, avatar, girlfriendAvatar });
+  saveUserInfo(userInfo);
+  applyUserInfo();
+  closeProfileModal();
+}
+
 /* ===== 渲染社交链接 ===== */
 function renderSocialLinks() {
   const container = document.getElementById("socialLinks");
@@ -388,6 +460,16 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       openAuthModal();
     }
+  });
+
+  // 个人简介编辑
+  document.getElementById("heroEditBtn")?.addEventListener("click", () => {
+    requireAuth(() => openProfileModal());
+  });
+  document.getElementById("profileCancel")?.addEventListener("click", closeProfileModal);
+  document.getElementById("profileConfirm")?.addEventListener("click", submitProfile);
+  document.getElementById("profileModal")?.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeProfileModal();
   });
 
   updateLockIcon();

@@ -100,13 +100,32 @@ a { text-decoration: none; color: inherit; }
   text-align: center;
 }
 
-.avatar-wrapper { margin-bottom: 24px; }
+.avatar-wrapper {
+  margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+}
 .avatar {
   width: 120px; height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--border);
   box-shadow: var(--shadow);
+}
+.avatar-heart {
+  font-size: 24px;
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.18); }
+  60% { transform: scale(1); }
+}
+
+.avatar-gf {
+  width: 100px; height: 100px;
 }
 
 .hero-name {
@@ -115,6 +134,47 @@ a { text-decoration: none; color: inherit; }
 }
 .hero-tagline {
   font-size: 17px; color: var(--text-light);
+  margin-bottom: 20px;
+}
+
+/* Hero 附加信息 */
+.hero-meta {
+  display: flex; justify-content: center; gap: 28px;
+  flex-wrap: wrap;
+}
+.hero-meta-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 15px; color: var(--text-light);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 18px;
+}
+.hero-meta-item .meta-icon { font-size: 16px; }
+.hero-meta-item .meta-label { font-weight: 500; color: var(--text); }
+
+/* Hero 编辑按钮 */
+.hero-content {
+  position: relative;
+}
+.hero-edit-btn {
+  position: absolute; top: -10px; right: -10px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--accent);
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-content:hover .hero-edit-btn {
+  opacity: 1;
+}
+.hero-edit-btn:hover {
+  transform: scale(1.1);
 }
 
 /* ===== 通用区块 ===== */
@@ -391,6 +451,9 @@ section { padding: 80px 24px; }
   .hero-name { font-size: 28px; }
   .section-header h2 { font-size: 24px; }
   .nav-links { gap: 18px; }
+  .avatar { width: 90px; height: 90px; }
+  .avatar-gf { width: 75px; height: 75px; }
+  .avatar-wrapper { gap: 4px; }
 }
 
 @media (max-width: 480px) {

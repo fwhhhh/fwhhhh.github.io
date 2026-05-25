@@ -33,6 +33,7 @@
   <!-- Hero 区域 -->
   <section class="hero" id="about">
     <div class="hero-content animate-on-scroll">
+      <button class="hero-edit-btn" id="heroEditBtn" title="编辑个人简介">✎</button>
       <div class="avatar-wrapper">
         <img
           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e8dfd0' width='100' height='100'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%23c4a882' font-size='40' font-family='sans-serif'%3E👤%3C/text%3E%3C/svg%3E"
@@ -40,9 +41,17 @@
           class="avatar"
           id="avatarImg"
         >
+        <span class="avatar-heart">💕</span>
+        <img
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e8dfd0' width='100' height='100'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%23c4a882' font-size='40' font-family='sans-serif'%3E👤%3C/text%3E%3C/svg%3E"
+          alt="女朋友头像"
+          class="avatar avatar-gf"
+          id="gfAvatarImg"
+        >
       </div>
       <h1 class="hero-name">你的昵称</h1>
       <p class="hero-tagline">一个热爱技术的大学生 · 持续学习中</p>
+      <div class="hero-meta" id="heroMeta"></div>
     </div>
   </section>
 
@@ -99,6 +108,41 @@
       <div class="modal-actions">
         <button class="modal-btn cancel" id="authCancel">取消</button>
         <button class="modal-btn confirm" id="authConfirm">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 个人简介编辑弹窗 -->
+  <div class="modal-overlay hidden" id="profileModal">
+    <div class="modal-card">
+      <h3>编辑个人简介</h3>
+      <div class="modal-field">
+        <label>昵称</label>
+        <input type="text" id="profileNickname" placeholder="你的昵称">
+      </div>
+      <div class="modal-field">
+        <label>标签语</label>
+        <input type="text" id="profileTagline" placeholder="一句话介绍自己">
+      </div>
+      <div class="modal-field">
+        <label>性别</label>
+        <input type="text" id="profileGender" placeholder="例如：男生">
+      </div>
+      <div class="modal-field">
+        <label>女朋友</label>
+        <input type="text" id="profileGirlfriend" placeholder="她的昵称">
+      </div>
+      <div class="modal-field">
+        <label>头像URL <small>(选填)</small></label>
+        <input type="text" id="profileAvatar" placeholder="图片链接或本地路径">
+      </div>
+      <div class="modal-field">
+        <label>女朋友头像URL <small>(选填)</small></label>
+        <input type="text" id="profileGfAvatar" placeholder="图片链接或本地路径">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="profileCancel">取消</button>
+        <button class="modal-btn confirm" id="profileConfirm">确定</button>
       </div>
     </div>
   </div>
