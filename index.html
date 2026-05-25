@@ -35,21 +35,26 @@
     <div class="hero-content animate-on-scroll">
       <button class="hero-edit-btn" id="heroEditBtn" title="编辑个人简介">✎</button>
       <div class="avatar-wrapper">
-        <img
-          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e8dfd0' width='100' height='100'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%23c4a882' font-size='40' font-family='sans-serif'%3E👤%3C/text%3E%3C/svg%3E"
-          alt="头像"
-          class="avatar"
-          id="avatarImg"
-        >
+        <div class="avatar-col">
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e8dfd0' width='100' height='100'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%23c4a882' font-size='40' font-family='sans-serif'%3E👤%3C/text%3E%3C/svg%3E"
+            alt="头像"
+            class="avatar"
+            id="avatarImg"
+          >
+          <span class="avatar-label hero-name">你的昵称</span>
+        </div>
         <span class="avatar-heart">💕</span>
-        <img
-          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e8dfd0' width='100' height='100'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%23c4a882' font-size='40' font-family='sans-serif'%3E👤%3C/text%3E%3C/svg%3E"
-          alt="女朋友头像"
-          class="avatar avatar-gf"
-          id="gfAvatarImg"
-        >
+        <div class="avatar-col">
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e8dfd0' width='100' height='100'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%23c4a882' font-size='40' font-family='sans-serif'%3E👤%3C/text%3E%3C/svg%3E"
+            alt="女朋友头像"
+            class="avatar avatar-gf"
+            id="gfAvatarImg"
+          >
+          <span class="avatar-label avatar-gf-name" id="gfNameLabel">打烊(LMQ)</span>
+        </div>
       </div>
-      <h1 class="hero-name">你的昵称</h1>
       <p class="hero-tagline">一个热爱技术的大学生 · 持续学习中</p>
       <div class="hero-meta" id="heroMeta"></div>
     </div>

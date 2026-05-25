@@ -75,7 +75,8 @@ const socialLinks = [
 /* ===== 初始化：用配置填充页面 ===== */
 function applyUserInfo() {
   if (userInfo.nickname) {
-    document.querySelector(".hero-name").textContent = userInfo.nickname;
+    const nameEl = document.querySelector(".avatar-label.hero-name");
+    if (nameEl) nameEl.textContent = userInfo.nickname;
   }
   if (userInfo.tagline) {
     document.querySelector(".hero-tagline").textContent = userInfo.tagline;
@@ -87,6 +88,10 @@ function applyUserInfo() {
   if (userInfo.girlfriendAvatar && gfImg) {
     gfImg.src = userInfo.girlfriendAvatar;
   }
+  if (userInfo.girlfriend) {
+    const gfName = document.getElementById("gfNameLabel");
+    if (gfName) gfName.textContent = userInfo.girlfriend;
+  }
 
   // 渲染附加信息
   const meta = document.getElementById("heroMeta");
@@ -95,15 +100,15 @@ function applyUserInfo() {
   if (userInfo.gender) {
     items.push(`
       <div class="hero-meta-item">
-        <span class="meta-icon">♂</span>
-        <span class="meta-label">${escapeHtml(userInfo.gender)}</span>
+        <span class="meta-label">性别</span>
+        <span class="meta-value">${escapeHtml(userInfo.gender)}</span>
       </div>`);
   }
   if (userInfo.girlfriend) {
     items.push(`
       <div class="hero-meta-item">
-        <span class="meta-icon">💕</span>
-        <span class="meta-label">${escapeHtml(userInfo.girlfriend)}</span>
+        <span class="meta-label">女朋友</span>
+        <span class="meta-value">${escapeHtml(userInfo.girlfriend)}</span>
       </div>`);
   }
   meta.innerHTML = items.join("");
