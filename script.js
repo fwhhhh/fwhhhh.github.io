@@ -189,7 +189,7 @@ let pendingAction = null;
 
 /* ===== 密码验证 ===== */
 // 修改下面这行来更换密码（SHA-256 哈希值）
-const PASSWORD_HASH = "ee3821c50561ccf1dd5a30d3211c97ea32a61d2c2b1a5e71c5122de557f2d089";
+const PASSWORD_HASH = "b2f39f84b44f8fa20852bb9f6699fcc5dff2285f7f2e05b123bb672b41a89a06";
 
 function isAuthed() {
   return sessionStorage.getItem("homepage_auth") === "1";
